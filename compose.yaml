@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  postgresql:
+    image: postgres:latest
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_DB: shortener
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+
+  shortener:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: amarin/shortener
+    container_name: shortener-app
+#    restart: on-failure
+    depends_on:
+      - postgresql
+    ports:
+      - "8888:8080"
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgresql
+      DB_PORT: 5432
+      DB_DATABASE: shortener
+      DB_USERNAME: admin
+      DB_PASSWORD: admin
+
+volumes:
+  postgresql-data:
+    driver: local
